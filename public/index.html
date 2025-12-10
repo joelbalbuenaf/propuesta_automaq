@@ -789,21 +789,15 @@
             dateElement.textContent = formattedDate;
             footerDateElement.textContent = formattedDate;
 
-            // Show element temporarily for PDF generation (position absolute to avoid page scroll)
+            // Show element temporarily for PDF generation
             element.classList.remove('hidden');
             element.style.display = 'block';
-            element.style.position = 'absolute';
-            element.style.left = '-9999px';
-            element.style.top = '0';
 
-            // Force a reflow to ensure the browser has rendered the element
-            void element.offsetHeight;
-
-            // Wait for fonts to load
+            // Wait for fonts and icons to load
             await document.fonts.ready;
 
-            // Wait for Font Awesome icons to render (increased delay for Render.com)
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Additional delay to ensure Font Awesome icons are rendered
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             const opt = {
                 margin: [20, 15, 20, 15],
@@ -814,9 +808,9 @@
                     useCORS: true,
                     letterRendering: true,
                     allowTaint: true,
-                    logging: false,
-                    width: 800,
-                    windowWidth: 800
+                    logging: true,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight
                 },
                 jsPDF: {
                     unit: 'mm',
@@ -833,11 +827,8 @@
                 alert('Hubo un error al generar el PDF. Por favor, intenta nuevamente.');
             } finally {
                 // Hide element again after PDF is generated
-                element.style.position = '';
-                element.style.left = '';
-                element.style.top = '';
-                element.style.display = '';
                 element.classList.add('hidden');
+                element.style.display = '';
             }
         }
 
