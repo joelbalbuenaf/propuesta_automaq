@@ -777,7 +777,7 @@
 
     <script>
         // Export to PDF function
-        function exportToPDF() {
+        async function exportToPDF() {
             const element = document.getElementById('pdf-content');
 
             // Add current date to PDF
@@ -789,6 +789,16 @@
             dateElement.textContent = formattedDate;
             footerDateElement.textContent = formattedDate;
 
+            // Show element temporarily for PDF generation
+            element.classList.remove('hidden');
+            element.style.display = 'block';
+
+            // Wait for fonts and icons to load
+            await document.fonts.ready;
+
+            // Additional delay to ensure Font Awesome icons are rendered
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             const opt = {
                 margin: [20, 15, 20, 15],
                 filename: 'Propuesta_Modernizacion_Datos.pdf',
@@ -797,7 +807,10 @@
                     scale: 2,
                     useCORS: true,
                     letterRendering: true,
-                    logging: false
+                    allowTaint: true,
+                    logging: true,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight
                 },
                 jsPDF: {
                     unit: 'mm',
@@ -807,13 +820,16 @@
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            // Show element temporarily for PDF generation
-            element.classList.remove('hidden');
-
-            html2pdf().set(opt).from(element).save().then(() => {
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Hubo un error al generar el PDF. Por favor, intenta nuevamente.');
+            } finally {
                 // Hide element again after PDF is generated
                 element.classList.add('hidden');
-            });
+                element.style.display = '';
+            }
         }
 
         // Mobile menu toggle
