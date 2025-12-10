@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: propuesta-automaq
+    env: static
+    buildCommand: echo "Static site - no build needed"
+    staticPublishPath: ./public
